@@ -15,6 +15,7 @@ var (
 	EmployersCollectionName  = GetConfigs("employersCollectionName")
 	OrganizersCollectionName = GetConfigs("organizersCollectionName")
 	Port                     = GetConfigs("httpPort")
+	DataBaseType             = GetConfigs("dataBaseType")
 )
 
 func GetConfigs(param string) string {

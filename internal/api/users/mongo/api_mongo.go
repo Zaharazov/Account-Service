@@ -11,7 +11,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-func SaveUser(login string, password string, roles []string) int32 { // TODO генерация id
+func SaveUser(login string, password string, roles []string) int32 { // TODO генерация id (используем пакет uuid от гугла)
 
 	user := models.User{
 		UserId:   12,
@@ -20,7 +20,7 @@ func SaveUser(login string, password string, roles []string) int32 { // TODO г�
 		Roles:    roles,
 	}
 
-	// логика сохранения вакансии в бд
+	// логика сохранения юзера в бд
 	insertResult, err := mongodb.UserCollection.InsertOne(context.TODO(), user)
 	log.Println(insertResult)
 	if err != nil {
