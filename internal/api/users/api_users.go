@@ -1,13 +1,13 @@
 package users
 
 import (
-	"Account-Service/internal/api/users/mongo"
+	mongodb "Account-Service/internal/database/mongodb/users"
+	"Account-Service/internal/models"
 	"encoding/json"
 	"mime"
 	"net/http"
 
-	"strconv"
-
+	"github.com/google/uuid"
 	"github.com/gorilla/mux"
 )
 
@@ -25,15 +25,15 @@ func ContentTypeCheck(w http.ResponseWriter, r *http.Request) error {
 	return nil
 }
 
-func GetUserIdFromURL(w http.ResponseWriter, r *http.Request) (int, error) {
+func GetUserIdFromURL(w http.ResponseWriter, r *http.Request) (uuid.UUID, error) {
 	vars := mux.Vars(r)
 	string_id, ok := vars["user_id"]
 	if !ok {
 		http.Error(w, "missing user_id", http.StatusBadRequest)
 	}
-	user_id, err := strconv.Atoi(string_id)
+	user_id, err := uuid.Parse(string_id)
 	if err != nil {
-		return -1, err
+		return user_id, err
 	}
 	return user_id, nil
 }
@@ -47,7 +47,7 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	type ResponseUserId struct {
-		Id int32 `json:"id"` // структура объекта, который отдаем
+		Id uuid.UUID `json:"id"` // структура объекта, который отдаем
 	}
 
 	err := ContentTypeCheck(w, r)
@@ -65,8 +65,13 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	id := mongo.SaveUser(ru.Login, ru.Password, ru.Roles) // создаем карточку по данным из запроса и получаем его id
-	js, err := json.Marshal(ResponseUserId{Id: id})       // формируем json ответ с id выше
+	id, err := mongodb.SaveUser(ru.Login, ru.Password, ru.Roles) // создаем карточку по данным из запроса и получаем его id
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	js, err := json.Marshal(ResponseUserId{Id: id}) // формируем json ответ с id выше
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -82,9 +87,10 @@ func DeleteUserById(w http.ResponseWriter, r *http.Request) {
 	user_id, err := GetUserIdFromURL(w, r)
 	if err != nil {
 		http.Error(w, "invalid user_id", http.StatusBadRequest)
+		return
 	}
 
-	err = mongo.DeleteUser(user_id)
+	err = mongodb.DeleteUser(user_id)
 
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusNotFound)
@@ -97,7 +103,8 @@ func DeleteUserById(w http.ResponseWriter, r *http.Request) {
 
 func GetAllUsers(w http.ResponseWriter, r *http.Request) {
 
-	users, err := mongo.GetUsers(-1)
+	plug := uuid.New()
+	users, err := mongodb.GetUsers(plug, 100)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusNotFound)
 		return
@@ -119,14 +126,22 @@ func GetUserById(w http.ResponseWriter, r *http.Request) {
 	user_id, err := GetUserIdFromURL(w, r)
 	if err != nil {
 		http.Error(w, "invalid user_id", http.StatusBadRequest)
+		return
 	}
 
-	users, err := mongo.GetUsers(user_id)
+	users, err := mongodb.GetUsers(user_id, 1)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusNotFound)
 		return
 	}
-	user := users[0]
+	var user models.User
+	if len(users) != 0 {
+		user = users[0]
+	} else {
+		http.Error(w, err.Error(), http.StatusNotFound)
+		return
+	}
+
 	js, err := json.Marshal(user)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -147,7 +162,7 @@ func EditUserById(w http.ResponseWriter, r *http.Request) {
 	}
 
 	type ResponseUserId struct {
-		Id int32 `json:"id"` // структура объекта, который отдаем
+		Id uuid.UUID `json:"id"` // структура объекта, который отдаем
 	}
 
 	_ = ContentTypeCheck(w, r)
@@ -155,6 +170,7 @@ func EditUserById(w http.ResponseWriter, r *http.Request) {
 	user_id, err := GetUserIdFromURL(w, r)
 	if err != nil {
 		http.Error(w, "invalid user_id", http.StatusBadRequest)
+		return
 	}
 
 	dec := json.NewDecoder(r.Body) // декодируем тело запроса
@@ -164,7 +180,13 @@ func EditUserById(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusBadRequest) // получаем декодированные данные и проверяем, что все ок
 		return
 	}
-	id, err := mongo.EditUser(user_id, ru.Login, ru.Password, ru.Roles)
+
+	if len(ru.Login) == 0 || len(ru.Password) == 0 || ru.Roles == nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	id, err := mongodb.EditUser(user_id, ru.Login, ru.Password, ru.Roles)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusNotModified)
 		return

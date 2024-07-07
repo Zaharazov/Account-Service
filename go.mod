@@ -4,6 +4,8 @@ go 1.21
 
 require go.mongodb.org/mongo-driver v1.16.0
 
+require github.com/google/uuid v1.6.0 // indirect
+
 require (
 	github.com/golang/snappy v0.0.4 // indirect
 	github.com/gorilla/mux v1.8.1

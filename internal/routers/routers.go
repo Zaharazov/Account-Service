@@ -39,35 +39,35 @@ var routes = Routes{
 	Route{
 		"CreateUser",
 		strings.ToUpper("Post"),
-		"/v1/users",
+		"/v1/users/",
 		users.CreateUser,
 	},
 
 	Route{
 		"DeleteUserById",
 		strings.ToUpper("Delete"),
-		"/v1/users/{user_id}",
+		"/v1/users/{user_id}/",
 		users.DeleteUserById,
 	},
 
 	Route{
 		"GetUserById",
 		strings.ToUpper("Get"),
-		"/v1/users/{user_id}",
+		"/v1/users/{user_id}/",
 		users.GetUserById,
 	},
 
 	Route{
 		"GetAllUsers",
 		strings.ToUpper("Get"),
-		"/v1/users",
+		"/v1/users/",
 		users.GetAllUsers,
 	},
 
 	Route{
 		"EditUserById",
 		strings.ToUpper("Put"),
-		"/v1/users/{user_id}",
+		"/v1/users/{user_id}/",
 		users.EditUserById,
 	},
 }
