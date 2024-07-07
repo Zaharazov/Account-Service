@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"mime"
 	"net/http"
+	"restapi/internal/api/users/mongo"
 
 	"strconv"
 
@@ -64,8 +65,8 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	id := SaveUser(ru.Login, ru.Password, ru.Roles) // создаем карточку по данным из запроса и получаем его id
-	js, err := json.Marshal(ResponseUserId{Id: id}) // формируем json ответ с id выше
+	id := mongo.SaveUser(ru.Login, ru.Password, ru.Roles) // создаем карточку по данным из запроса и получаем его id
+	js, err := json.Marshal(ResponseUserId{Id: id})       // формируем json ответ с id выше
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -83,7 +84,7 @@ func DeleteUserById(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "invalid user_id", http.StatusBadRequest)
 	}
 
-	err = DeleteUser(user_id)
+	err = mongo.DeleteUser(user_id)
 
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusNotFound)
@@ -96,7 +97,7 @@ func DeleteUserById(w http.ResponseWriter, r *http.Request) {
 
 func GetAllUsers(w http.ResponseWriter, r *http.Request) {
 
-	users, err := GetUsers(-1)
+	users, err := mongo.GetUsers(-1)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusNotFound)
 		return
@@ -120,7 +121,7 @@ func GetUserById(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "invalid user_id", http.StatusBadRequest)
 	}
 
-	users, err := GetUsers(user_id)
+	users, err := mongo.GetUsers(user_id)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusNotFound)
 		return
@@ -163,7 +164,7 @@ func EditUserById(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusBadRequest) // получаем декодированные данные и проверяем, что все ок
 		return
 	}
-	id, err := EditUser(user_id, ru.Login, ru.Password, ru.Roles)
+	id, err := mongo.EditUser(user_id, ru.Login, ru.Password, ru.Roles)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusNotModified)
 		return

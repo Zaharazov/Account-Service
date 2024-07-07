@@ -1,4 +1,4 @@
-package users
+package mongo
 
 import (
 	"context"

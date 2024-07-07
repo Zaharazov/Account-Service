@@ -8,7 +8,6 @@ import (
 )
 
 var (
-	HttpPort                 = GetConfigs("httpPort")
 	MongoURI                 = GetConfigs("mongoURI")
 	DBName                   = GetConfigs("databaseName")
 	UsersCollectionName      = GetConfigs("usersCollectionName")
