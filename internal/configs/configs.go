@@ -8,10 +8,14 @@ import (
 )
 
 var (
-	MongoURI            = GetConfigs("mongoURI")
-	DBName              = GetConfigs("databaseName")
-	UsersCollectionName = GetConfigs("usersCollectionName")
-	Port                = GetConfigs("httpPort")
+	HttpPort                 = GetConfigs("httpPort")
+	MongoURI                 = GetConfigs("mongoURI")
+	DBName                   = GetConfigs("databaseName")
+	UsersCollectionName      = GetConfigs("usersCollectionName")
+	StudentsCollectionName   = GetConfigs("studentsCollectionName")
+	EmployersCollectionName  = GetConfigs("employersCollectionName")
+	OrganizersCollectionName = GetConfigs("organizersCollectionName")
+	Port                     = GetConfigs("httpPort")
 )
 
 func GetConfigs(param string) string {

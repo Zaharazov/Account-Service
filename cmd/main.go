@@ -3,8 +3,9 @@ package main
 import (
 	"log"
 	"net/http"
-	"restapi/integer/database/mongodb"
-	"restapi/integer/routers"
+	"restapi/internal/configs"
+	"restapi/internal/database/mongodb"
+	"restapi/internal/routers"
 )
 
 func main() {
@@ -15,5 +16,5 @@ func main() {
 
 	router := routers.NewRouter()
 
-	log.Fatal(http.ListenAndServe(":8080", router))
+	log.Fatal(http.ListenAndServe(configs.HttpPort, router))
 }

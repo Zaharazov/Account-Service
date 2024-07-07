@@ -1,10 +1,10 @@
 package routers
 
 import (
-	"fmt"
 	"net/http"
-	"restapi/integer/api/users"
-	"restapi/integer/logger"
+	"restapi/internal/api/users"
+	"restapi/internal/logger"
+
 	"strings"
 
 	"github.com/gorilla/mux"
@@ -36,18 +36,7 @@ func NewRouter() *mux.Router {
 	return router
 }
 
-func Index(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "Hello World!")
-}
-
 var routes = Routes{
-	Route{
-		"Index",
-		"GET",
-		"/v1/",
-		Index,
-	},
-
 	Route{
 		"CreateUser",
 		strings.ToUpper("Post"),
@@ -79,7 +68,7 @@ var routes = Routes{
 	Route{
 		"EditUserById",
 		strings.ToUpper("Put"),
-		"/v1/users/{users_id}",
+		"/v1/users/{user_id}",
 		users.EditUserById,
 	},
 }

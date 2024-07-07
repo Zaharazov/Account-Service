@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log"
-	"restapi/integer/configs"
+	"restapi/internal/configs"
 
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
