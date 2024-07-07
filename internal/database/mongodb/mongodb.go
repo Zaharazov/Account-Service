@@ -1,10 +1,10 @@
 package mongodb
 
 import (
+	"Account-Service/internal/configs"
 	"context"
 	"fmt"
 	"log"
-	"restapi/internal/configs"
 
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"

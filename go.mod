@@ -1,4 +1,4 @@
-module restapi
+module Account-Service
 
 go 1.21
 

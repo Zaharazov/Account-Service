@@ -1,10 +1,9 @@
 package routers
 
 import (
+	"Account-Service/internal/api/users"
+	"Account-Service/internal/logger"
 	"net/http"
-	"restapi/internal/api/users"
-	"restapi/internal/logger"
-
 	"strings"
 
 	"github.com/gorilla/mux"

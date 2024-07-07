@@ -1,11 +1,11 @@
 package mongo
 
 import (
+	"Account-Service/internal/database/mongodb"
+	"Account-Service/internal/models"
 	"context"
 	"errors"
 	"log"
-	"restapi/internal/database/mongodb"
-	"restapi/internal/models"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo/options"

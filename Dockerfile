@@ -1,17 +1,15 @@
-# Базовый образ, над которым производим доработки
-FROM golang:1.19
-# Определяем рабочую директорию
+FROM golang:1.22.5
+COPY . /app
 WORKDIR /app
-# Устанавливаем зависиомости
-COPY go.mod go.sum ./ 
-# здесь копируем requirements
-RUN go mod download 
-# а здесь их устанавливаем
-# Копируем код исходников
-COPY *.go ./cmd ./internal .
-# Собираем
-RUN CGO_ENABLED=0 GOOS=windows go build -o /goexec
-# Пробрасываем внешний порт для подключения извне
+RUN go mod download
+WORKDIR /app/cmd
+RUN go build -o goexec main.go
 EXPOSE 8080
-# Запускаем
-CMD ["/goexec"]
+
+ENV POSTGRES_USER postgres
+ENV POSTGRES_PASSWORD postgres
+ENV POSTGRES_HOST postgres
+ENV POSTGRES_PORT 5432
+ENV POSTGRES_DB_NAME postgres
+
+CMD ["./goexec"]

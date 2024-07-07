@@ -1,11 +1,12 @@
 package main
 
 import (
+	"Account-Service/internal/configs"
+	"Account-Service/internal/database/mongodb"
+	"Account-Service/internal/database/postgres"
+	"Account-Service/internal/routers"
 	"log"
 	"net/http"
-	"restapi/internal/configs"
-	"restapi/internal/database/postgres"
-	"restapi/internal/routers"
 )
 
 func main() {
@@ -13,7 +14,7 @@ func main() {
 	log.Printf("Server started")
 
 	postgres.ConnectToPostgres()
-	//mongodb.ConnectToMongo()
+	mongodb.ConnectToMongo()
 
 	router := routers.NewRouter()
 

@@ -1,10 +1,10 @@
 package users
 
 import (
+	"Account-Service/internal/api/users/mongo"
 	"encoding/json"
 	"mime"
 	"net/http"
-	"restapi/internal/api/users/mongo"
 
 	"strconv"
 

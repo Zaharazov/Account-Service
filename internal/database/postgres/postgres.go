@@ -4,14 +4,15 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
+	"os"
 )
 
-const (
-	host     = "172.20.0.3"
-	port     = 5432
-	user     = "postgres"
-	password = "postgres"
-	dbname   = "postgres"
+var (
+	host     = os.Getenv("POSTGRES_HOST")
+	port     = os.Getenv("POSTGRES_PORT")
+	user     = os.Getenv("POSTGRES_USER")
+	password = os.Getenv("POSTGRES_PASSWORD")
+	dbname   = os.Getenv("POSTGRES_DB_NAME")
 )
 
 func ConnectToPostgres() {
