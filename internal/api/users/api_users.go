@@ -1,7 +1,9 @@
 package users
 
 import (
-	mongodb "Account-Service/internal/database/mongodb/users"
+	mongodb_o "Account-Service/internal/database/mongodb/organizers"
+	mongodb_s "Account-Service/internal/database/mongodb/students"
+	mongodb_u "Account-Service/internal/database/mongodb/users"
 	"Account-Service/internal/models"
 	"encoding/json"
 	"mime"
@@ -65,10 +67,37 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	id, err := mongodb.SaveUser(ru.Login, ru.Password, ru.Roles) // создаем карточку по данным из запроса и получаем его id
+	user_id := uuid.New()
+	id, err := mongodb_u.SaveUser(user_id, ru.Login, ru.Password, ru.Roles) // создаем карточку по данным из запроса и получаем его id
+
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
+	}
+
+	for _, role := range ru.Roles {
+		if role == "student" {
+			_, err = mongodb_s.SaveStudent(user_id, "", "", "", "", "", "", "")
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return
+			}
+		}
+		if role == "organizer" {
+			_, err = mongodb_o.SaveOrganizer(user_id, "", "", "")
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return
+			}
+		}
+		// if role == "employer" {
+		// 	_, err = mongodb_e.SaveEmployer(user_id, "", "", "", "", "", "", "")
+		// 	if err != nil {
+		// 		http.Error(w, err.Error(), http.StatusInternalServerError)
+		// 		return
+		// 	}
+		// }
+
 	}
 
 	js, err := json.Marshal(ResponseUserId{Id: id}) // формируем json ответ с id выше
@@ -90,12 +119,16 @@ func DeleteUserById(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = mongodb.DeleteUser(user_id)
+	err = mongodb_u.DeleteUser(user_id)
 
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusNotFound)
 		return
 	}
+
+	mongodb_s.DeleteStudent(user_id)
+	mongodb_o.DeleteOrganizer(user_id)
+	//mongodb_e.DeleteEmployer(user_id)
 
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	w.WriteHeader(http.StatusOK)
@@ -104,7 +137,7 @@ func DeleteUserById(w http.ResponseWriter, r *http.Request) {
 func GetAllUsers(w http.ResponseWriter, r *http.Request) {
 
 	plug := uuid.New()
-	users, err := mongodb.GetUsers(plug, 100)
+	users, err := mongodb_u.GetUsers(plug, 100)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusNotFound)
 		return
@@ -129,7 +162,7 @@ func GetUserById(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	users, err := mongodb.GetUsers(user_id, 1)
+	users, err := mongodb_u.GetUsers(user_id, 1)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusNotFound)
 		return
@@ -186,7 +219,7 @@ func EditUserById(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	id, err := mongodb.EditUser(user_id, ru.Login, ru.Password, ru.Roles)
+	id, err := mongodb_u.EditUser(user_id, ru.Login, ru.Password, ru.Roles)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusNotModified)
 		return

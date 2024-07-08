@@ -1,20 +1,54 @@
-package mongodb
+package mongodb_u
 
 import (
 	"Account-Service/internal/database/mongodb"
+	mongodb_o "Account-Service/internal/database/mongodb/organizers"
+	mongodb_s "Account-Service/internal/database/mongodb/students"
 	"Account-Service/internal/models"
 	"context"
 	"errors"
 	"log"
+	"sort"
 
 	"github.com/google/uuid"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-func SaveUser(login string, password string, roles []string) (uuid.UUID, error) { // TODO генерация id (используем пакет uuid от гугла)
+var const_roles []string = []string{"student", "organizer", "employer"}
 
-	user_id := uuid.New()
+func CompareRoles(old_roles, new_roles []string) map[string]string {
+	var results map[string]string
+	var orMap map[string]bool
+	var nrMap map[string]bool
+
+	for _, role := range const_roles {
+		orMap[role] = false
+		nrMap[role] = false
+		results[role] = ""
+	}
+
+	for _, role := range const_roles {
+		orMap[role] = (sort.SearchStrings(old_roles, role) != len(old_roles))
+		nrMap[role] = (sort.SearchStrings(old_roles, role) != len(new_roles))
+	}
+
+	for _, role := range const_roles {
+		or := orMap[role]
+		nr := nrMap[role]
+		if or == nr {
+			results[role] = "nothing" // or = nr = 1 / or = nr = 0
+		} else if !or && nr {
+			results[role] = "create" // or = 0, nr = 1
+		} else if or && !nr {
+			results[role] = "delete" // or = 1, nr = 0
+		}
+	}
+
+	return results
+}
+
+func SaveUser(user_id uuid.UUID, login string, password string, roles []string) (uuid.UUID, error) { // TODO генерация id (используем пакет uuid от гугла)
 
 	user := models.User{
 		UserId:   user_id,
@@ -96,10 +130,47 @@ func EditUser(user_id uuid.UUID, login, password string, roles []string) (uuid.U
 		}},
 	}
 
+	new_roles := roles
+
+	users, err := GetUsers(user_id, 1)
+	old_roles := users[0].Roles
+
+	results := CompareRoles(old_roles, new_roles)
+
 	result, err := mongodb.UserCollection.UpdateOne(context.TODO(), filter, update)
 	if err != nil {
 		log.Println(err)
 		return user_id, err
+	}
+
+	s_status := results["student"]
+	o_status := results["organizer"]
+	//e_status := results["employer"]
+
+	switch s_status {
+	case "create":
+		_, err = mongodb_s.SaveStudent(user_id, "", "", "", "", "", "", "")
+		if err != nil {
+			return user_id, err
+		}
+	case "delete":
+		err = mongodb_s.DeleteStudent(user_id)
+		if err != nil {
+			return user_id, err
+		}
+	}
+
+	switch o_status {
+	case "create":
+		_, err = mongodb_o.SaveOrganizer(user_id, "", "", "")
+		if err != nil {
+			return user_id, err
+		}
+	case "delete":
+		err = mongodb_o.DeleteOrganizer(user_id)
+		if err != nil {
+			return user_id, err
+		}
 	}
 
 	if result.ModifiedCount == 0 {

@@ -13,6 +13,9 @@ import (
 var client, err = mongo.NewClient(options.Client().ApplyURI(configs.MongoURI))
 
 var UserCollection = client.Database(configs.DBName).Collection(configs.UsersCollectionName)
+var StudentCollection = client.Database(configs.DBName).Collection(configs.StudentsCollectionName)
+var EmployerCollection = client.Database(configs.DBName).Collection(configs.EmployersCollectionName)
+var OrganizerCollection = client.Database(configs.DBName).Collection(configs.OrganizersCollectionName)
 
 func ConnectToMongo() {
 	// Create connect
