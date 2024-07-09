@@ -1,0 +1,637 @@
+basePath: /v1
+definitions:
+  models.Employer:
+    properties:
+      description:
+        description: Description for Employer
+        type: string
+      focus:
+        description: Scope of the organization's work
+        type: string
+      name:
+        description: Name of the organization
+        type: string
+      photo:
+        description: Link to the photo for Employer
+        type: string
+      user_id:
+        description: User ID
+        type: string
+      vacancies:
+        description: Employer-created vacancies
+        items:
+          type: string
+        type: array
+    type: object
+  models.Organizer:
+    properties:
+      description:
+        description: Description for Organizer
+        type: string
+      events:
+        description: Organizer-created events
+        items:
+          type: string
+        type: array
+      name:
+        description: Organizer's name
+        type: string
+      photo:
+        description: Link to the photo for Organizer
+        type: string
+      user_id:
+        description: User ID
+        type: string
+    type: object
+  models.Student:
+    properties:
+      description:
+        description: Description for Student
+        type: string
+      full_name:
+        description: Full Student name (last name, first name, patronymic)
+        type: string
+      github:
+        description: Link to Student's GitHub
+        type: string
+      group:
+        description: Student's group number
+        type: string
+      mail:
+        description: Student's e-mail
+        type: string
+      photo:
+        description: Link to the photo for Student
+        type: string
+      record_book:
+        description: Record book number
+        type: string
+      user_id:
+        description: User ID
+        type: string
+    type: object
+  models.User:
+    properties:
+      login:
+        description: Login for User
+        type: string
+      password:
+        description: Password for User
+        type: string
+      roles:
+        description: Roles that belong to the User
+        items:
+          type: string
+        type: array
+      user_id:
+        description: User ID
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  description: API для сервиса акканутов
+  title: Account Service API
+  version: "1.0"
+paths:
+  /v1/users:
+    get:
+      consumes:
+      - application/json
+      description: Получить список всех пользователей
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.User'
+            type: array
+        "400":
+          description: '{"message"}'
+          schema:
+            type: string
+        "404":
+          description: '{"message"}'
+          schema:
+            type: string
+        "500":
+          description: '{"message"}'
+          schema:
+            type: string
+      summary: Get the list of all Users
+      tags:
+      - Users
+  /v1/users/:
+    post:
+      consumes:
+      - application/json
+      description: Создать нового пользователя
+      parameters:
+      - description: User need to be created
+        in: body
+        name: User
+        required: true
+        schema:
+          $ref: '#/definitions/models.User'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: '{"user_id"}'
+          schema:
+            type: string
+        "400":
+          description: '{"message"}'
+          schema:
+            type: string
+        "500":
+          description: '{"message"}'
+          schema:
+            type: string
+      summary: Create new User
+      tags:
+      - Users
+  /v1/users/{user_id}:
+    delete:
+      consumes:
+      - application/json
+      description: Удалить пользователя по ID
+      parameters:
+      - description: User ID
+        in: path
+        name: user_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: '{"message"}'
+          schema:
+            type: string
+        "404":
+          description: '{"message"}'
+          schema:
+            type: string
+        "500":
+          description: '{"message"}'
+          schema:
+            type: string
+      summary: Delete User by id
+      tags:
+      - Users
+    get:
+      consumes:
+      - application/json
+      description: Получить пользователя по его ID
+      parameters:
+      - description: User ID
+        in: path
+        name: user_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.User'
+        "400":
+          description: '{"message"}'
+          schema:
+            type: string
+        "404":
+          description: '{"message"}'
+          schema:
+            type: string
+        "500":
+          description: '{"message"}'
+          schema:
+            type: string
+      summary: Get User by id
+      tags:
+      - Users
+    put:
+      consumes:
+      - application/json
+      description: Обновить существующего пользователя
+      parameters:
+      - description: User ID
+        in: path
+        name: user_id
+        required: true
+        type: string
+      - description: User
+        in: body
+        name: User
+        required: true
+        schema:
+          $ref: '#/definitions/models.User'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"user_id"}'
+          schema:
+            type: string
+        "304":
+          description: '{"message"}'
+          schema:
+            type: string
+        "400":
+          description: '{"message"}'
+          schema:
+            type: string
+      summary: Update User by id
+      tags:
+      - Users
+  /v1/users/employers:
+    get:
+      consumes:
+      - application/json
+      description: Получить список всех работодателей
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Employer'
+            type: array
+        "400":
+          description: '{"message"}'
+          schema:
+            type: string
+        "404":
+          description: '{"message"}'
+          schema:
+            type: string
+        "500":
+          description: '{"message"}'
+          schema:
+            type: string
+      summary: Get the list of all Employers
+      tags:
+      - Employers
+  /v1/users/employers/{user_id}:
+    get:
+      consumes:
+      - application/json
+      description: Получить работодателя по его ID
+      parameters:
+      - description: User ID
+        in: path
+        name: user_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Employer'
+        "400":
+          description: '{"message"}'
+          schema:
+            type: string
+        "404":
+          description: '{"message"}'
+          schema:
+            type: string
+        "500":
+          description: '{"message"}'
+          schema:
+            type: string
+      summary: Get Employer by id
+      tags:
+      - Employers
+    put:
+      consumes:
+      - application/json
+      description: Обновить существующего работодателя
+      parameters:
+      - description: User ID
+        in: path
+        name: user_id
+        required: true
+        type: string
+      - description: Employer
+        in: body
+        name: Employer
+        required: true
+        schema:
+          $ref: '#/definitions/models.Employer'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"user_id"}'
+          schema:
+            type: string
+        "304":
+          description: '{"message"}'
+          schema:
+            type: string
+        "400":
+          description: '{"message"}'
+          schema:
+            type: string
+      summary: Update Employer by id
+      tags:
+      - Employers
+  /v1/users/employers/search:
+    get:
+      consumes:
+      - application/json
+      description: Найти определенных работодателей
+      parameters:
+      - description: Employer
+        in: body
+        name: Employer
+        required: true
+        schema:
+          $ref: '#/definitions/models.Employer'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Employer'
+            type: array
+        "304":
+          description: '{"message"}'
+          schema:
+            type: string
+        "400":
+          description: '{"message"}'
+          schema:
+            type: string
+      summary: Find Employer by parameters
+      tags:
+      - Employers
+  /v1/users/organizers:
+    get:
+      consumes:
+      - application/json
+      description: Получить список всех организаторов
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Organizer'
+            type: array
+        "400":
+          description: '{"message"}'
+          schema:
+            type: string
+        "404":
+          description: '{"message"}'
+          schema:
+            type: string
+        "500":
+          description: '{"message"}'
+          schema:
+            type: string
+      summary: Get the list of all Organizers
+      tags:
+      - Organizers
+  /v1/users/organizers/{user_id}:
+    get:
+      consumes:
+      - application/json
+      description: Получить организатора по его ID
+      parameters:
+      - description: User ID
+        in: path
+        name: user_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Organizer'
+        "400":
+          description: '{"message"}'
+          schema:
+            type: string
+        "404":
+          description: '{"message"}'
+          schema:
+            type: string
+        "500":
+          description: '{"message"}'
+          schema:
+            type: string
+      summary: Get Organizer by id
+      tags:
+      - Organizers
+    put:
+      consumes:
+      - application/json
+      description: Обновить существующего организатора
+      parameters:
+      - description: User ID
+        in: path
+        name: user_id
+        required: true
+        type: string
+      - description: Organizer
+        in: body
+        name: Organizer
+        required: true
+        schema:
+          $ref: '#/definitions/models.Organizer'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"user_id"}'
+          schema:
+            type: string
+        "304":
+          description: '{"message"}'
+          schema:
+            type: string
+        "400":
+          description: '{"message"}'
+          schema:
+            type: string
+      summary: Update Organizer by id
+      tags:
+      - Organizers
+  /v1/users/organizers/search:
+    get:
+      consumes:
+      - application/json
+      description: Найти определенных организаторов
+      parameters:
+      - description: Organizer
+        in: body
+        name: Organizer
+        required: true
+        schema:
+          $ref: '#/definitions/models.Organizer'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Organizer'
+            type: array
+        "304":
+          description: '{"message"}'
+          schema:
+            type: string
+        "400":
+          description: '{"message"}'
+          schema:
+            type: string
+      summary: Find Organizer by parameters
+      tags:
+      - Organizers
+  /v1/users/students:
+    get:
+      consumes:
+      - application/json
+      description: Получить список всех студентов
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Student'
+            type: array
+        "400":
+          description: '{"message"}'
+          schema:
+            type: string
+        "404":
+          description: '{"message"}'
+          schema:
+            type: string
+        "500":
+          description: '{"message"}'
+          schema:
+            type: string
+      summary: Get the list of all Students
+      tags:
+      - Students
+  /v1/users/students/{user_id}:
+    get:
+      consumes:
+      - application/json
+      description: Получить студента по его ID
+      parameters:
+      - description: User ID
+        in: path
+        name: user_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Student'
+        "400":
+          description: '{"message"}'
+          schema:
+            type: string
+        "404":
+          description: '{"message"}'
+          schema:
+            type: string
+        "500":
+          description: '{"message"}'
+          schema:
+            type: string
+      summary: Get Student by id
+      tags:
+      - Students
+    put:
+      consumes:
+      - application/json
+      description: Обновить существующего студента
+      parameters:
+      - description: User ID
+        in: path
+        name: user_id
+        required: true
+        type: string
+      - description: Student
+        in: body
+        name: Student
+        required: true
+        schema:
+          $ref: '#/definitions/models.Student'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"user_id"}'
+          schema:
+            type: string
+        "304":
+          description: '{"message"}'
+          schema:
+            type: string
+        "400":
+          description: '{"message"}'
+          schema:
+            type: string
+      summary: Update Student by id
+      tags:
+      - Students
+  /v1/users/students/search:
+    get:
+      consumes:
+      - application/json
+      description: Найти определенных студентов
+      parameters:
+      - description: Student
+        in: body
+        name: Student
+        required: true
+        schema:
+          $ref: '#/definitions/models.Student'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Student'
+            type: array
+        "304":
+          description: '{"message"}'
+          schema:
+            type: string
+        "400":
+          description: '{"message"}'
+          schema:
+            type: string
+      summary: Find Student by parameters
+      tags:
+      - Students
+swagger: "2.0"

@@ -1,54 +1,28 @@
 version: '3.5'
 
-services:
-  # app:
-  #   container_name: app_container
-  #   image: app
-  #   environment:
-  #     POSTGRES_USER: postgres
-  #     POSTGRES_PASSWORD: postgres
-  #     POSTGRES_HOST: postgres
-  #     POSTGRES_PORT: 5432
-  #     POSTGRES_DB_NAME: postgres
-  #   networks:
-  #     - postgres
-  #   restart: on-failure
-
-  postgres:
-    container_name: postgres_container
-    image: postgres
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      PGDATA: /data/postgres
-    volumes:
-      - postgres:/data/postgres
-    ports:
-      - "5433:5432"
-    networks:
-      - postgres
-    restart: unless-stopped
-  
-  pgadmin:
-    container_name: pgadmin_container
-    image: dpage/pgadmin4
-    environment:
-      PGADMIN_DEFAULT_EMAIL: admin@mymail.ru
-      PGADMIN_DEFAULT_PASSWORD: adminpassword
-      PGADMIN_CONFIG_SERVER_MODE: 'False'
-    volumes:
-      - pgadmin:/var/lib/pgadmin
-
-    ports:
-      - 80:80
-    networks:
-      - postgres
-    restart: unless-stopped
-
 networks:
-  postgres:
+  acc-service-net:
     driver: bridge
 
 volumes:
-    postgres:
-    pgadmin:
+  dbdata6:
+
+services:
+  acc-service:
+    container_name: acc-service
+    image: acc-service
+    ports:
+      - "8080:8080"
+    networks:
+      - acc-service-net
+    restart: on-failure
+
+  mongodb:
+    container_name: mongodb
+    image: mongo:6-jammy
+    ports:
+      - '27017:27017'
+    volumes:
+      - dbdata6:/data/db
+    networks:
+      - acc-service-net
